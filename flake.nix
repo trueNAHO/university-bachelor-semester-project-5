@@ -2,6 +2,11 @@
   description = "University: Bachelor Semester Project 5 (2024/09/16--2025/01/31)";
 
   inputs = {
+    "1brc" = {
+      flake = false;
+      url = "github:gunnarmorling/1brc";
+    };
+
     advisory-db = {
       flake = false;
       url = "github:rustsec/advisory-db";
@@ -78,10 +83,7 @@
               filter = path: type:
                 type
                 == "regular"
-                && (
-                  lib.hasSuffix "assets/input-1000000000.txt" path
-                  || lib.hasSuffix "assets/output-1000000000.txt" path
-                )
+                && lib.hasSuffix "assets/output-1000000000.txt" path
                 || self.lib.filterCargoSources path type;
 
               name = "source";
@@ -142,7 +144,18 @@
             };
 
             cargo-nextest = crane.lib.cargoNextest (
-              crane.args // {inherit (crane) cargoArtifacts;}
+              crane.args
+              // {
+                inherit (crane) cargoArtifacts;
+
+                postPatch = let
+                  input = inputs.self.packages.${system}.input-1000000000;
+                in ''
+                  substituteInPlace \
+                    crates/lib/src/solution.rs \
+                    --replace-fail {../../assets,${input}}/input-
+                '';
+              }
             );
 
             cargo-test-doc = crane.lib.cargoDocTest (
@@ -190,23 +203,47 @@
                 map
                 (
                   workspace: let
-                    package = args:
+                    package = {inputDefault ? false}: args: let
+                      input = {
+                        all = pkgs.buildEnv {
+                          name = "input-default";
+
+                          paths =
+                            lib.attrValues
+                            (
+                              lib.attrsets.filterAttrs
+                              (name: _: lib.hasPrefix "input-" name)
+                              self
+                            );
+                        };
+
+                        default = pkgs.buildEnv {
+                          name = "input-default";
+
+                          paths =
+                            lib.attrValues
+                            (
+                              lib.attrsets.filterAttrs
+                              (name: _: name == "input-1000000000")
+                              self
+                            );
+                        };
+                      };
+                    in
                       crane.buildPackage (
                         {
                           cargoExtraArgs = "--package ${workspace}";
                           meta.mainProgram = workspace;
 
-                          postInstall = ''
-                            install \
-                              -D \
-                              ${assets/input-1000000000.txt} \
-                              $out/assets/input-1000000000.txt
-                          '';
-
-                          postPatch = ''
+                          postPatch = let
+                            assets =
+                              if inputDefault
+                              then input.default
+                              else input.all;
+                          in ''
                             substituteInPlace \
                               crates/lib/src/solution.rs \
-                              --replace-fail ../../assets ${./assets}
+                              --replace-fail ../../assets ${assets}
                           '';
 
                           src = crane.workspace.src [
@@ -220,7 +257,7 @@
                     "${workspace}-bench" = let
                       bench = builtins.replaceStrings ["-"] ["_"] workspace;
                     in
-                      package {
+                      package {inputDefault = false;} {
                         __impure = true;
                         buildPhaseCargoCommand = "cargo bench -- ${bench}";
                         doNotPostBuildInstallCargoBinaries = true;
@@ -232,7 +269,7 @@
                         '';
                       };
 
-                    "${workspace}-dev" = package {CARGO_PROFILE = "dev";};
+                    "${workspace}-dev" = package {} {CARGO_PROFILE = "dev";};
 
                     "${workspace}-flamegraph" = pkgs.writeShellApplication {
                       name = "${workspace}-flamegraph";
@@ -258,13 +295,49 @@
                       runtimeInputs = [pkgs.cargo-flamegraph];
                     };
 
-                    "${workspace}-release" = package {};
+                    "${workspace}-release" = package {} {};
                   }
                 )
                 (
                   builtins.filter
                   (directory: directory != "hakari" && directory != "lib")
                   (builtins.attrNames (builtins.readDir ./crates))
+                )
+              )
+              ++ (
+                map
+                (
+                  size: let
+                    name = "input-${size}";
+                  in {
+                    ${name} = pkgs.stdenvNoCC.mkDerivation {
+                      inherit name;
+
+                      buildPhase = ''
+                        (
+                          cd src/main/python || exit
+                          python3 create_measurements.py ${size}
+                        )
+                      '';
+
+                      installPhase = ''
+                        install -D data/measurements.txt $out/${name}.txt
+                      '';
+
+                      nativeBuildInputs = [pkgs.python3];
+                      src = inputs."1brc";
+                    };
+                  }
+                )
+                (
+                  map toString [
+                    10000
+                    100000
+                    1000000
+                    10000000
+                    100000000
+                    1000000000
+                  ]
                 )
               )
               ++ [
