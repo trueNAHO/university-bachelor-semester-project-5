@@ -1,0 +1,8 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "lib"
+version.workspace = true
+
+[dependencies]
+hakari.workspace = true

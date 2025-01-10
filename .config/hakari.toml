@@ -1,0 +1,3 @@
+dep-format-version = "4"
+hakari-package = "hakari"
+resolver = "2"

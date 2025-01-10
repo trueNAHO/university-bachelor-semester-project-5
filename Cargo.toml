@@ -1,0 +1,25 @@
+[profile.bench]
+inherits = "dev"
+
+[workspace]
+members = ["crates/*"]
+
+[workspace.dependencies]
+criterion = "0.5.1"
+hakari = { version = "0.1", path = "crates/hakari" }
+lib = { path = "crates/lib" }
+
+[workspace.metadata.crane]
+name = "1brc"
+
+[workspace.package]
+authors = ["NAHO <90870942+trueNAHO@users.noreply.github.com>"]
+description = "University: Bachelor Semester Project 5 (2024/09/16--2025/01/31)"
+edition = "2021"
+homepage = "https://github.com/trueNAHO/university-bachelor-semester-project-5"
+license = "MIT"
+name = "1brc"
+publish = false
+repository = "https://github.com/trueNAHO/university-bachelor-semester-project-5"
+resolver = "2"
+version = "0.1.0"

@@ -1,0 +1,16 @@
+[[bench]]
+harness = false
+name = "iteration-02-base"
+
+[package]
+edition.workspace = true
+license.workspace = true
+name = "iteration-02-base"
+version.workspace = true
+
+[dependencies]
+hakari.workspace = true
+lib.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
