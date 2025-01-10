@@ -7,7 +7,11 @@ macro_rules! bench {
         pub fn benchmark(c: &mut Criterion) {
             c.bench_function(
                 stringify!($type).split("::").next().unwrap(),
-                |b| b.iter(<$type>::solve),
+                |b| {
+                    b.iter(|| {
+                        <$type>::solve(&<$type>::input_file(<$type>::SIZE))
+                    })
+                },
             );
         }
 
@@ -23,7 +27,7 @@ macro_rules! main {
         use $type;
 
         fn main() {
-            println!("{}", <$type>::solve());
+            println!("{}", <$type>::solve(&<$type>::input_file(<$type>::SIZE)));
         }
     };
 }

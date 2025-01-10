@@ -79,8 +79,8 @@
                 type
                 == "regular"
                 && (
-                  lib.hasSuffix "assets/input.txt" path
-                  || lib.hasSuffix "assets/output.txt" path
+                  lib.hasSuffix "assets/input-1000000000.txt" path
+                  || lib.hasSuffix "assets/output-1000000000.txt" path
                 )
                 || self.lib.filterCargoSources path type;
 
@@ -197,7 +197,10 @@
                           meta.mainProgram = workspace;
 
                           postInstall = ''
-                            install -D ${assets/input.txt} $out/assets/input.txt
+                            install \
+                              -D \
+                              ${assets/input-1000000000.txt} \
+                              $out/assets/input-1000000000.txt
                           '';
 
                           postPatch = ''
