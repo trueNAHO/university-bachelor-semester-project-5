@@ -203,44 +203,41 @@
                 map
                 (
                   workspace: let
-                    package = {inputDefault ? false}: args: let
-                      input = {
-                        all = pkgs.buildEnv {
-                          name = "input-default";
+                    package = {inputDefault ? true}: args: let
+                      assets =
+                        if inputDefault
+                        then inputs.self.packages.${system}.input-1000000000
+                        else
+                          pkgs.buildEnv {
+                            name = "input-default";
 
-                          paths =
-                            lib.attrValues
-                            (
-                              lib.attrsets.filterAttrs
-                              (name: _: lib.hasPrefix "input-" name)
-                              self
-                            );
-                        };
-
-                        default = pkgs.buildEnv {
-                          name = "input-default";
-
-                          paths =
-                            lib.attrValues
-                            (
-                              lib.attrsets.filterAttrs
-                              (name: _: name == "input-1000000000")
-                              self
-                            );
-                        };
-                      };
+                            paths =
+                              lib.attrValues
+                              (
+                                lib.attrsets.filterAttrs
+                                (name: _: lib.hasPrefix "input-" name)
+                                self
+                              );
+                          };
                     in
                       crane.buildPackage (
                         {
                           cargoExtraArgs = "--package ${workspace}";
                           meta.mainProgram = workspace;
 
-                          postPatch = let
-                            assets =
-                              if inputDefault
-                              then input.default
-                              else input.all;
-                          in ''
+                          postInstall = ''
+                            mkdir --parent $out/assets
+
+                            cp \
+                              --no-preserve=mode \
+                              --recursive \
+                              ${assets}/. \
+                              $out/assets
+
+                            find $out
+                          '';
+
+                          postPatch = ''
                             substituteInPlace \
                               crates/lib/src/solution.rs \
                               --replace-fail ../../assets ${assets}
