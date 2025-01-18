@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 
 pub trait Solution {
-    const SIZE: isize = 1e9 as isize;
+    const SIZE: isize = 1e5 as isize;
 
     fn input_file(size: isize) -> String {
         format!("../../assets/input-{}.txt", size)

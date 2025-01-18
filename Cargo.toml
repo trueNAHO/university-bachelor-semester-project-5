@@ -8,6 +8,7 @@ members = ["crates/*"]
 criterion = "0.5.1"
 hakari = { version = "0.1", path = "crates/hakari" }
 lib = { path = "crates/lib" }
+tap = "1.0.1"
 
 [workspace.metadata.crane]
 name = "1brc"

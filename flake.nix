@@ -83,7 +83,7 @@
               filter = path: type:
                 type
                 == "regular"
-                && lib.hasSuffix "assets/output-1000000000.txt" path
+                && lib.hasSuffix "assets/output-100000.txt" path
                 || self.lib.filterCargoSources path type;
 
               name = "source";
@@ -149,7 +149,7 @@
                 inherit (crane) cargoArtifacts;
 
                 postPatch = let
-                  input = inputs.self.packages.${system}.input-1000000000;
+                  input = inputs.self.packages.${system}.input-100000;
                 in ''
                   substituteInPlace \
                     crates/lib/src/solution.rs \
@@ -171,7 +171,12 @@
 
                 deadnix.enable = true;
                 statix.enable = true;
-                typos.enable = true;
+
+                typos = {
+                  enable = true;
+                  settings.exclude = "assets/output-*.txt";
+                };
+
                 yamllint.enable = true;
               };
 
@@ -206,7 +211,7 @@
                     package = {inputDefault ? true}: args: let
                       assets =
                         if inputDefault
-                        then inputs.self.packages.${system}.input-1000000000
+                        then inputs.self.packages.${system}.input-100000
                         else
                           pkgs.buildEnv {
                             name = "input-default";
@@ -326,16 +331,7 @@
                     };
                   }
                 )
-                (
-                  map toString [
-                    10000
-                    100000
-                    1000000
-                    10000000
-                    100000000
-                    1000000000
-                  ]
-                )
+                (map toString [10000 100000])
               )
               ++ [
                 (
