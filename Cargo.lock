@@ -214,6 +214,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "iteration-02-avoid-utf-8-validation"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "hakari",
+ "lib",
+ "tap",
+]
+
+[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

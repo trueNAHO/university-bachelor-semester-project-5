@@ -1,0 +1,17 @@
+[[bench]]
+harness = false
+name = "iteration-02-avoid-utf-8-validation"
+
+[package]
+edition.workspace = true
+license.workspace = true
+name = "iteration-02-avoid-utf-8-validation"
+version.workspace = true
+
+[dependencies]
+hakari.workspace = true
+lib.workspace = true
+tap.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
