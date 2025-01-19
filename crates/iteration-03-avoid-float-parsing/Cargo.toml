@@ -1,0 +1,17 @@
+[[bench]]
+harness = false
+name = "iteration-03-avoid-float-parsing"
+
+[package]
+edition.workspace = true
+license.workspace = true
+name = "iteration-03-avoid-float-parsing"
+version.workspace = true
+
+[dependencies]
+hakari.workspace = true
+lib.workspace = true
+tap.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
