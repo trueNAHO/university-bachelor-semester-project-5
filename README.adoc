@@ -1,1 +1,80 @@
 = University: Bachelor Semester Project 5 (2024/09/16--2025/01/31)
+:toc:
+
+PoC implementation of link:https://github.com/RagnarGrootKoerkamp/1brc[The One
+Billion Row Challenge (1BRC)], with a strong emphasis on the build system.
+
+== Usage
+
+To inspect all available outputs, run:
+
+[,console]
+----
+nix flake show
+----
+
+[NOTE]
+Some of the following packages depend on the `input-*` packages, which take a
+while to build.
+
+=== Binaries
+
+To launch the binaries compiled with the _dev_ profile, run one of the following
+commands:
+
+[,console]
+----
+nix run .#iteration-01-base-dev
+nix run .#iteration-02-avoid-utf-8-validation-dev
+nix run .#iteration-03-avoid-float-parsing-dev
+----
+
+To launch the binaries compiled with the _release_ profile, run one of the
+following commands:
+
+[,console]
+----
+nix run .#iteration-01-base-release
+nix run .#iteration-02-avoid-utf-8-validation-release
+nix run .#iteration-03-avoid-float-parsing-release
+----
+
+=== Benchmarks
+
+To run the benchmarks, run one of the following commands:
+
+[,console]
+----
+nix build .#iteration-01-base-bench
+nix build .#iteration-02-avoid-utf-8-validation-bench
+nix build .#iteration-03-avoid-float-parsing-bench
+----
+
+=== Flamegraphs
+
+To generate the flamegraphs, run one of the following commands:
+
+[,console]
+----
+nix run .#iteration-01-base-flamegraph
+nix run .#iteration-02-avoid-utf-8-validation-flamegraph
+nix run .#iteration-03-avoid-float-parsing-flamegraph
+----
+
+=== Diff
+
+To compare consecutive iterations, run the following command:
+
+[,console]
+----
+nix build .#diff
+----
+
+=== Documentation
+
+To generate the documentation, run the following command:
+
+[,console]
+----
+nix build .#docs
+----
